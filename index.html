@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>위험성평가 제출 현황</title>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#f3f5f6;--card:#fff;--ink:#1c2630;--sub:#5f6d7b;--line:#dce2e7;--brand:#0f766e;--brand-d:#115e59;--soft:#e6f4f2;
+--ok:#15803d;--okbg:#e5f5ea;--miss:#a16207;--missbg:#fff3a6;--x:#b42318;--xbg:#fde7e4;--sec:#6d28d9;--secbg:#efe7fe;--na:#8a96a3;--nabg:#eef1f4;--unk:#c3ccd5}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif}
+.wrap{max-width:1280px;margin:0 auto;padding:0 16px 48px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;padding:26px 0 14px}
+.eyebrow{color:var(--brand);font-weight:700;font-size:13px}
+h1{margin:2px 0 4px;font-size:26px;line-height:1.25}
+.top p{margin:0;color:var(--sub);font-size:14px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;position:sticky;top:0;z-index:5}
+.yearnav{display:flex;align-items:center;gap:6px;font-weight:700}
+.yearnav button{width:32px;height:32px;border:1px solid var(--line);background:#fff;border-radius:8px;font-size:18px;cursor:pointer}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs button{border:0;background:transparent;padding:8px 13px;border-radius:8px;font:inherit;font-weight:600;color:var(--sub);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--soft);color:var(--brand-d)}
+.tabs .cnt{font-size:12px;background:var(--missbg);color:var(--miss);border-radius:999px;padding:0 7px;margin-left:4px}
+.tools{display:flex;gap:8px;align-items:center}
+.saved{font-size:12px;color:var(--ok);min-width:56px;text-align:right}
+details.menu{position:relative}
+details.menu summary{list-style:none;cursor:pointer;border:1px solid var(--line);background:#fff;padding:7px 12px;border-radius:8px;font-weight:600;font-size:14px}
+details.menu summary::-webkit-details-marker{display:none}
+.pop{position:absolute;right:0;top:40px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:6px;width:280px;z-index:10}
+.pop button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:9px 10px;border-radius:8px;font:inherit;cursor:pointer}
+.pop button:hover{background:var(--bg)}
+.pop small{display:block;color:var(--sub);font-size:12px}
+.pop hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 13px;font:inherit;font-weight:600;cursor:pointer;color:var(--ink)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.danger{color:var(--x)}
+.btn.sm{padding:3px 9px;font-size:13px}
+.warn{margin:12px 0 0;background:#fdeaea;border:1px solid #f3c1c1;color:#7f1d1d;padding:10px 14px;border-radius:10px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:14px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:13px;color:var(--sub);margin-bottom:10px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.scroll{overflow:auto;border:1px solid var(--line);border-radius:10px}
+table.grid{border-collapse:collapse;width:100%;min-width:900px;font-size:13px;background:#fff}
+.grid th,.grid td{border-bottom:1px solid var(--line);border-right:1px solid #eef1f4;padding:4px 4px;text-align:center;vertical-align:middle}
+.grid thead th{background:#eef2f4;position:sticky;top:0;z-index:1;font-weight:700;color:#36434f;padding:7px 4px}
+.grid thead th.mh{cursor:pointer}
+.grid thead th.mh:hover{background:#e0e8ec}
+.grid .team{background:#f8fafb;font-weight:700;text-align:left;color:var(--brand-d);white-space:nowrap;padding-left:10px;width:96px}
+.grid .org{text-align:left;padding-left:10px;min-width:190px;font-weight:600}
+.grid .org small{display:block;color:var(--sub);font-weight:400;font-size:11px}
+.grid td.now,.grid th.now{background:#f1fbf9}
+.grid thead th.now{background:#cfece7}
+.grid tfoot td{background:#eef2f4;font-weight:700;color:#36434f;font-size:12px;padding:6px 4px}
+.grid .tot{font-weight:700;width:64px}
+.mk{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:28px;border-radius:7px;border:0;font:inherit;font-weight:800;font-size:14px;cursor:pointer;background:transparent;color:var(--unk);padding:0 4px}
+.mk{cursor:default}button.mk{cursor:pointer}button.mk:hover{box-shadow:inset 0 0 0 2px var(--brand)}
+.mk.ok{background:var(--okbg);color:var(--ok)}
+.mk.miss{background:var(--missbg);color:var(--miss);font-size:12px}
+.mk.x{background:var(--xbg);color:var(--x)}
+.mk.sec{background:var(--secbg);color:var(--sec)}
+.mk.na{background:var(--nabg);color:var(--na)}
+.mk.unk{font-weight:400}
+.picker{position:absolute;z-index:30;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.18);padding:8px;width:236px}
+.picker .ttl{font-size:12px;color:var(--sub);margin:0 2px 6px}
+.picker .opts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.picker button{display:flex;gap:6px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 8px;font:inherit;font-size:13px;cursor:pointer;text-align:left}
+.picker button.on{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand)}
+.picker button .mk{min-width:26px;height:22px;font-size:12px;pointer-events:none}
+.picker .bulk button{width:100%;margin-top:6px;justify-content:flex-start}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.toolbar select,.toolbar input{border:1px solid var(--line);border-radius:8px;padding:7px 10px;font:inherit;font-size:14px;background:#fff}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.stat b{display:block;font-size:22px}
+.stat span{font-size:12px;color:var(--sub)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.box{border:1px solid var(--line);border-radius:10px;padding:14px}
+.box h3{margin:0 0 8px;font-size:15px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.box h4{margin:12px 0 4px;font-size:13px;color:var(--sub)}
+.chiplist{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;gap:6px;align-items:center;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
+.chip small{font-weight:400;opacity:.8}
+.chip.miss{background:var(--missbg);color:var(--miss)}.chip.x{background:var(--xbg);color:var(--x)}.chip.sec{background:var(--secbg);color:var(--sec)}.chip.unk{background:#eef1f4;color:var(--sub)}
+.empty{color:var(--sub);font-size:14px;padding:6px 0}
+textarea.copy{width:100%;min-height:120px;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;font-size:13px;margin-top:8px}
+table.list{width:100%;border-collapse:collapse;font-size:14px}
+.list th,.list td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:middle}
+.list th{background:#eef2f4;font-size:13px}
+.list input{border:1px solid var(--line);border-radius:6px;padding:5px 8px;font:inherit;font-size:14px;width:100%}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.f{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--sub);font-weight:600}
+.f input{border:1px solid var(--line);border-radius:8px;padding:7px 10px;font:inherit;font-size:14px;color:var(--ink);font-weight:400}
+.notes{margin-top:22px;font-size:13px;color:var(--sub);display:grid;gap:8px}
+.notes b{color:var(--ink)}
+#printRoot{display:none}
+@media (max-width:720px){h1{font-size:21px}.bar{position:static}.pop{right:auto;left:0}}
+@media print{
+ @page{size:A4 landscape;margin:8mm}
+ body.printing{background:#fff}
+ body.printing .wrap,body.printing .picker{display:none!important}
+ body.printing #printRoot{display:block}
+ #printRoot{font-size:8.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ #printRoot h2{font-size:14pt;margin:0 0 4px;text-align:center}
+ #printRoot .pm{display:flex;justify-content:space-between;font-size:9pt;margin-bottom:4px}
+ #printRoot table{width:100%;border-collapse:collapse}
+ #printRoot th,#printRoot td{border:1px solid #777;padding:1.5px 3px;text-align:center}
+ #printRoot th{background:#e6eef7}
+ #printRoot td.l{text-align:left}
+ #printRoot td.miss{background:#ffff00}
+ #printRoot .psec{page-break-after:always}
+ #printRoot .psec:last-child{page-break-after:auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <header class="top">
+  <div>
+   <div class="eyebrow">위험성평가 · 사업소별 월간 제출 관리</div>
+   <h1>위험성평가 제출 현황</h1>
+   <p>사업소마다 매월 대상작업 조사목록과 주간평가를 냈는지 표시하고, 미제출 사업소를 바로 골라냅니다.</p>
+  </div>
+  <label class="f">작성 부서<input id="owner" placeholder="예) 안전관리파트"></label>
+ </header>
+ <noscript><div class="warn">이 페이지는 자바스크립트가 필요합니다.</div></noscript>
+ <div id="warn"></div>
+
+ <div class="bar">
+  <div class="yearnav"><button type="button" data-act="year" data-v="-1" aria-label="이전 해">‹</button><span id="yearLabel"></span><button type="button" data-act="year" data-v="1" aria-label="다음 해">›</button></div>
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <div class="tools">
+   <span class="saved" id="saved"></span>
+   <details class="menu" id="dl">
+    <summary>내려받기 ▾</summary>
+    <div class="pop">
+     <button type="button" data-act="xlsx">엑셀<small>점검별 연간표·미제출 목록 (.xlsx)</small></button>
+     <button type="button" data-act="print">PDF 연간 현황표<small>A4 가로, 미제출 칸 노란색 (인쇄창에서 'PDF로 저장')</small></button>
+     <hr>
+     <button type="button" data-act="backup">백업 저장<small>다른 PC로 옮길 때 (.json)</small></button>
+     <button type="button" data-act="restore">백업 불러오기<small>저장해 둔 파일로 되돌리기</small></button>
+    </div>
+   </details>
+   <input type="file" id="file" accept=".json,application/json" hidden>
+  </div>
+ </div>
+
+ <main id="main"></main>
+
+ <section class="notes">
+  <div><b>기본 데이터</b> 처음 열면 첨부하신 한글 문서(2026년 위험성평가 대상작업 조사목록·주간평가 표)의 표시를 그대로 옮겨 둔 상태입니다. 원본의 0은 제출, -는 해당없음, 노란 칸은 미제출로 옮겼고, x와 §는 원본 기호 그대로 두었습니다. 기호의 이름은 [사업소·설정] 탭에서 바꿀 수 있습니다.</div>
+  <div><b>저장 위치</b> 입력한 내용은 지금 쓰는 브라우저에만 저장되고 어디로도 전송되지 않습니다. 브라우저 기록을 지우면 함께 지워지니 [내려받기 → 백업 저장]으로 보관하세요.</div>
+ </section>
+</div>
+<div id="pk"></div>
+<div id="printRoot"></div>
+
+<script>
+(function(){
+'use strict';
+var KEY='riskSubmitStatus.v1';
+var SEED={"orgs":[{"id":"o1","team":"감사팀","name":"감사팀"},{"id":"o2","team":"기획평가팀","name":"기획평가팀"},{"id":"o3","team":"경영지원팀","name":"경영지원팀"},{"id":"o4","team":"안전시설팀","name":"공단청사"},{"id":"o5","team":"안전시설팀","name":"공중화장실"},{"id":"o6","team":"안전시설팀","name":"보도물청소"},{"id":"o7","team":"안전시설팀","name":"스마트쉼터"},{"id":"o8","team":"청사환경팀","name":"성동종합행정마을"},{"id":"o9","team":"청사환경팀","name":"성동보건소"},{"id":"o10","team":"청사환경팀","name":"왕십리도선동 공공복합청사"},{"id":"o11","team":"청사환경팀","name":"성동아이사랑복합문화센터"},{"id":"o12","team":"청사환경팀","name":"사근동 공공복합청사"},{"id":"o13","team":"청사환경팀","name":"성수1가제2동공공복합청사"},{"id":"o14","team":"청사환경팀","name":"옥수동 공공복합청사"},{"id":"o15","team":"청사환경팀","name":"왕십리제2동 공공복합청사"},{"id":"o16","team":"청사환경팀","name":"성동구자원회수센터"},{"id":"o17","team":"주차사업팀","name":"주차관리"},{"id":"o18","team":"열린체육팀","name":"열린금호교육문화관"},{"id":"o19","team":"열린체육팀","name":"옥정교육문화관"},{"id":"o20","team":"열린체육팀","name":"단일체육"},{"id":"o21","team":"생활체육팀","name":"성동구민체육센터,응봉축구,풋살장"},{"id":"o22","team":"행복체육팀","name":"서울숲복합문화체육센터"},{"id":"o23","team":"행복체육팀","name":"성동구립용답체육센터"},{"id":"o24","team":"행복체육팀","name":"마장국민체육센터"},{"id":"o25","team":"행복체육팀","name":"송정동작은체육관"}],
+"A":{"o1":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok","11":"ok"},"o2":{"1":"ok","2":"ok","5":"x","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok","11":"ok"},"o3":{"5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok","11":"ok"},"o4":{"1":"ok","2":"ok","3":"ok","4":"sec","5":"ok","6":"ok","7":"ok","8":"ok","11":"ok"},"o5":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","11":"ok"},"o6":{"1":"x","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok","11":"ok"},"o7":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok","11":"ok"},"o8":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok"},"o9":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok"},"o10":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok"},"o11":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok"},"o12":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok"},"o13":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok"},"o14":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok"},"o15":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok"},"o16":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok"},"o17":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok","11":"ok"},"o18":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok","11":"ok"},"o19":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok","11":"ok"},"o20":{"1":"ok","2":"x","3":"ok","4":"ok","5":"ok","6":"ok","9":"ok","10":"ok","11":"ok"},"o21":{"1":"ok","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"ok","8":"ok","9":"ok","10":"ok","11":"ok"},"o22":{"1":"ok","2":"sec","3":"ok","4":"ok","5":"ok","6":"sec","7":"ok","8":"ok","9":"ok","10":"ok","11":"ok"},"o23":{"1":"sec","2":"ok","3":"ok","4":"ok","5":"ok","6":"ok","7":"sec","8":"ok","9":"ok","10":"ok","11":"ok"},"o24":{"1":"ok","2":"ok","3":"sec","4":"ok","5":"ok","6":"sec","7":"sec","8":"ok","9":"ok","10":"ok","11":"ok"},"o25":{"1":"sec","2":"ok","3":"sec","4":"sec","5":"sec","6":"ok","7":"sec","8":"sec","9":"sec","10":"ok"}},
+"B":{"o1":{"1":"na","2":"na","3":"na","4":"na","5":"na"},"o2":{"1":"na","2":"na","3":"na","4":"na","5":"na"},"o3":{"1":"na","2":"na","3":"na","4":"na","5":"na"},"o4":{"1":"na","3":"na","4":"na","5":"na","7":"miss","8":"miss","9":"miss","10":"miss","11":"ok"},"o5":{"1":"na","2":"na","3":"na","5":"na","8":"ok","11":"ok"},"o6":{"1":"na","2":"na","3":"na","5":"na","7":"miss","8":"miss","9":"miss","10":"miss","11":"ok"},"o7":{"1":"na","2":"na","3":"na","5":"na","7":"miss","8":"miss","9":"miss","10":"miss","11":"ok"},"o8":{"1":"na","3":"na","5":"na","9":"ok","10":"ok"},"o9":{"1":"na","2":"na","3":"na","4":"na","7":"miss","8":"miss","9":"miss","10":"miss","11":"miss"},"o10":{"1":"na","2":"na","3":"na","4":"na","7":"miss","8":"miss","9":"miss","10":"miss","11":"miss"},"o11":{"1":"ok","2":"na","4":"na","5":"na","7":"ok"},"o12":{"1":"ok","2":"na","3":"na","4":"na","5":"na","7":"miss","8":"miss","9":"miss","10":"miss","11":"miss"},"o13":{"1":"na","2":"na","4":"na","5":"na","9":"ok"},"o14":{"1":"na","2":"na","4":"na","9":"ok"},"o15":{"1":"ok","2":"na","3":"na","4":"na","5":"na","7":"miss","8":"miss","9":"miss","10":"miss","11":"miss"},"o16":{"1":"ok","2":"na","5":"na","8":"ok","10":"ok"},"o17":{"1":"na","2":"na","3":"na","5":"na","7":"miss","8":"miss","9":"miss","10":"miss","11":"ok"},"o18":{"1":"na","4":"na","5":"na","8":"ok"},"o19":{"1":"na","3":"na","4":"na","5":"na","10":"ok"},"o20":{"1":"na","2":"na","4":"na","8":"ok","10":"ok"},"o21":{"1":"ok","2":"na","3":"na","4":"na","9":"ok","10":"ok"},"o22":{"1":"na","2":"na","3":"na","10":"ok"},"o23":{"1":"na","2":"na","3":"na","5":"na","9":"ok"},"o24":{"1":"na","3":"na","4":"na","5":"na","10":"ok"},"o25":{"1":"ok","2":"na","3":"na","4":"na","5":"na","7":"miss","8":"miss","9":"miss","10":"miss","11":"miss"}}};
+var ST=['ok','miss','x','sec','na'];
+var DEF_LABELS={ok:{sym:'○',name:'제출'},miss:{sym:'미제출',name:'미제출'},x:{sym:'x',name:'x (원본 표기)'},sec:{sym:'§',name:'§ (원본 표기)'},na:{sym:'−',name:'해당없음'}};
+var MONTHS=[1,2,3,4,5,6,7,8,9,10,11,12];
+var now=new Date(),today={y:now.getFullYear(),m:now.getMonth()+1};
+var year=today.y,view='c1',storageOK=true,savedTimer=null,pickCtx=null,repMonth=Math.max(1,today.m-1),repYear=today.y;
+
+function $(s){return document.querySelector(s);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function uid(p){return (p||'')+Date.now().toString(36)+Math.floor(Math.random()*46656).toString(36);}
+function clone(o){return JSON.parse(JSON.stringify(o));}
+
+function fresh(){
+ var d={v:1,owner:'',orgs:clone(SEED.orgs),checks:[{id:'c1',name:'대상작업 조사목록'},{id:'c2',name:'주간평가'}],labels:clone(DEF_LABELS),marks:{}};
+ d.marks[2026]={c1:clone(SEED.A),c2:clone(SEED.B)};
+ return d;
+}
+function valid(d){return d&&Array.isArray(d.orgs)&&Array.isArray(d.checks)&&d.checks.length&&d.marks&&typeof d.marks==='object';}
+function normalize(d){
+ d.labels=d.labels||{};ST.forEach(function(k){d.labels[k]=d.labels[k]||clone(DEF_LABELS[k]);});
+ d.owner=d.owner||'';
+ return d;
+}
+function load(){
+ try{var raw=localStorage.getItem(KEY);if(raw){var d=JSON.parse(raw);if(valid(d))return normalize(d);}}catch(e){storageOK=false;}
+ return fresh();
+}
+var S=load();
+if(!S.checks.some(function(c){return c.id===view;}))view=S.checks[0].id;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));flash();}catch(e){storageOK=false;renderWarn();}}
+function flash(){var el=$('#saved');el.textContent='저장됨 ✓';clearTimeout(savedTimer);savedTimer=setTimeout(function(){el.textContent='';},1400);}
+function renderWarn(){$('#warn').innerHTML=storageOK?'':'<div class="warn">이 환경에서는 브라우저 저장이 막혀 있습니다. 새로고침하면 입력한 내용이 사라지니 [내려받기 → 백업 저장]을 자주 해주세요.</div>';}
+
+/* ---------- 상태 ---------- */
+function get(y,cid,oid,m){var a=S.marks[y],b=a&&a[cid],c=b&&b[oid];return (c&&c[m])||'';}
+function set(y,cid,oid,m,v){
+ var a=S.marks[y]=S.marks[y]||{},b=a[cid]=a[cid]||{},c=b[oid]=b[oid]||{};
+ if(v)c[m]=v;else delete c[m];
+}
+function past(y,m){return y<today.y||(y===today.y&&m<today.m);}
+function lab(k){return S.labels[k]||DEF_LABELS[k];}
+function mark(k,attrs){
+ if(!k)return '<button type="button" class="mk unk" '+attrs+' title="미확인">·</button>';
+ var l=lab(k);
+ return '<button type="button" class="mk '+k+'" '+attrs+' title="'+esc(l.name)+'">'+esc(l.sym)+'</button>';
+}
+function chip(k){
+ if(!k)return '<span class="mk unk">·</span>';
+ return '<span class="mk '+k+'">'+esc(lab(k).sym)+'</span>';
+}
+function checkName(cid){var c=S.checks.filter(function(x){return x.id===cid;})[0];return c?c.name:'';}
+function teams(){var out=[],idx={};S.orgs.forEach(function(o){if(!(o.team in idx)){idx[o.team]=out.length;out.push({team:o.team,orgs:[]});}out[idx[o.team]].orgs.push(o);});return out;}
+function missingCount(){
+ var n=0,y=today.y;
+ S.checks.forEach(function(c){S.orgs.forEach(function(o){MONTHS.forEach(function(m){if(m<=today.m&&get(y,c.id,o.id,m)==='miss')n++;});});});
+ return n;
+}
+
+/* ---------- 연간표 ---------- */
+function gridTable(cid,inter){
+ var cm=year===today.y?today.m:0;
+ var h='<table class="grid"><thead><tr><th>팀</th><th style="text-align:left;padding-left:10px">사업소</th>';
+ MONTHS.forEach(function(m){h+='<th class="mh'+(m===cm?' now':'')+'" '+(inter?'data-act="mhead" data-m="'+m+'" title="'+m+'월 일괄 입력"':'')+'>'+m+'월</th>';});
+ h+='<th class="tot">미제출</th></tr></thead><tbody>';
+ var no=0;
+ teams().forEach(function(t){
+  t.orgs.forEach(function(o,i){
+   no++;
+   var miss=0;
+   h+='<tr>'+(i===0?'<td class="team" rowspan="'+t.orgs.length+'">'+esc(t.team)+'</td>':'')+'<td class="org">'+no+'. '+esc(o.name)+'</td>';
+   MONTHS.forEach(function(m){
+    var k=get(year,cid,o.id,m);if(k==='miss')miss++;
+    h+='<td class="'+(m===cm?'now':'')+'">'+mark(k,inter?'data-act="cell" data-o="'+o.id+'" data-m="'+m+'"':'')+'</td>';
+   });
+   h+='<td class="tot" style="color:'+(miss?'var(--miss)':'var(--unk)')+'">'+(miss||'-')+'</td></tr>';
+  });
+ });
+ h+='</tbody><tfoot><tr><td colspan="2" style="text-align:left;padding-left:10px">소계 (제출 / 대상)</td>';
+ MONTHS.forEach(function(m){
+  var ok=0,tgt=0;S.orgs.forEach(function(o){var k=get(year,cid,o.id,m);if(k!=='na'){tgt++;if(k==='ok')ok++;}});
+  var any=S.orgs.some(function(o){return get(year,cid,o.id,m);});
+  h+='<td class="'+(m===cm?'now':'')+'">'+(any?ok+'/'+tgt:'')+'</td>';
+ });
+ h+='<td></td></tr></tfoot></table>';
+ return h;
+}
+function legend(){
+ return '<div class="legend">'+ST.map(function(k){return '<span>'+chip(k)+' '+esc(lab(k).name)+'</span>';}).join('')+'<span>'+chip('')+' 미확인(빈칸)</span><span>· 칸을 누르면 상태를 고를 수 있어요. 월 제목을 누르면 그 달을 한꺼번에 채울 수 있어요.</span></div>';
+}
+function renderCheck(cid){
+ var cm=year===today.y?today.m:12,ok=0,miss=0,unk=0;
+ S.orgs.forEach(function(o){for(var m=1;m<=cm;m++){var k=get(year,cid,o.id,m);if(k==='ok')ok++;else if(k==='miss')miss++;else if(!k&&past(year,m))unk++;}});
+ return '<div class="card"><div class="stats">'
+  +'<div class="stat"><b>'+S.orgs.length+'</b><span>사업소</span></div>'
+  +'<div class="stat"><b style="color:var(--ok)">'+ok+'</b><span>'+year+'년 제출 칸</span></div>'
+  +'<div class="stat"><b style="color:var(--miss)">'+miss+'</b><span>미제출 칸</span></div>'
+  +'<div class="stat"><b style="color:var(--sub)">'+unk+'</b><span>지난 달 미확인(빈칸)</span></div></div>'
+  +legend()+'<div class="scroll">'+gridTable(cid,true)+'</div></div>';
+}
+
+/* ---------- 미제출 목록 ---------- */
+function reportFor(y,m){
+ return S.checks.map(function(c){
+  var g={miss:[],x:[],sec:[],unk:[]};
+  S.orgs.forEach(function(o){
+   var k=get(y,c.id,o.id,m);
+   if(k==='miss'||k==='x'||k==='sec')g[k].push(o);
+   else if(!k&&past(y,m))g.unk.push(o);
+  });
+  return {c:c,g:g};
+ });
+}
+function reportText(y,m){
+ var lines=[y+'년 '+m+'월 위험성평가 미제출 사업소'];
+ reportFor(y,m).forEach(function(r){
+  lines.push('');lines.push('■ '+r.c.name);
+  var any=false;
+  [['miss',lab('miss').name],['x',lab('x').name],['sec',lab('sec').name],['unk','미확인']].forEach(function(p){
+   if(r.g[p[0]].length){any=true;lines.push('- '+p[1]+' ('+r.g[p[0]].length+'곳): '+r.g[p[0]].map(function(o){return o.name+'('+o.team+')';}).join(', '));}
+  });
+  if(!any)lines.push('- 미제출 사업소 없음');
+ });
+ return lines.join('\n');
+}
+function renderReport(){
+ var years=Object.keys(S.marks).map(Number);if(years.indexOf(today.y)<0)years.push(today.y);years.sort();
+ var h='<div class="card"><div class="toolbar"><div class="row">'
+  +'<label class="f">연도<select data-act="repY">'+years.map(function(y){return '<option'+(y===repYear?' selected':'')+'>'+y+'</option>';}).join('')+'</select></label>'
+  +'<label class="f">월<select data-act="repM">'+MONTHS.map(function(m){return '<option value="'+m+'"'+(m===repMonth?' selected':'')+'>'+m+'월</option>';}).join('')+'</select></label></div>'
+  +'<button type="button" class="btn primary" data-act="copy">목록 복사 (메신저·공문용)</button></div><div class="two">';
+ reportFor(repYear,repMonth).forEach(function(r){
+  var total=r.g.miss.length+r.g.x.length+r.g.sec.length;
+  h+='<div class="box"><h3>'+esc(r.c.name)+'<span class="chip '+(total?'miss':'unk')+'">'+(total?'표시 '+total+'곳':'미제출 없음')+'</span></h3>';
+  [['miss',lab('miss').name],['x',lab('x').name],['sec',lab('sec').name],['unk','미확인 (빈칸)']].forEach(function(p){
+   var arr=r.g[p[0]];if(!arr.length)return;
+   h+='<h4>'+esc(p[1])+' '+arr.length+'곳</h4><div class="chiplist">'+arr.map(function(o){return '<span class="chip '+p[0]+'">'+esc(o.name)+'<small>'+esc(o.team)+'</small></span>';}).join('')+'</div>';
+  });
+  if(!total&&!r.g.unk.length)h+='<div class="empty">이 달은 모든 사업소가 제출했거나 해당없음입니다.</div>';
+  h+='</div>';
+ });
+ h+='</div><textarea class="copy" id="copyText" readonly>'+esc(reportText(repYear,repMonth))+'</textarea>'
+  +'<div style="font-size:12px;color:var(--sub);margin-top:4px">위 글을 복사해 독촉 메시지나 공문에 붙여 넣을 수 있어요.</div></div>';
+ return h;
+}
+
+/* ---------- 설정 ---------- */
+function renderSettings(){
+ var h='<div class="card"><h3 style="margin:0 0 10px">사업소 목록</h3><div class="scroll"><table class="list"><thead><tr><th style="width:44px">No</th><th>팀</th><th>사업소</th><th style="width:150px"></th></tr></thead><tbody>';
+ S.orgs.forEach(function(o,i){
+  h+='<tr><td>'+(i+1)+'</td><td><input data-org="'+o.id+'" data-f="team" value="'+esc(o.team)+'"></td><td><input data-org="'+o.id+'" data-f="name" value="'+esc(o.name)+'"></td>'
+   +'<td style="white-space:nowrap"><button type="button" class="btn sm" data-act="up" data-o="'+o.id+'" aria-label="위로">↑</button> <button type="button" class="btn sm" data-act="down" data-o="'+o.id+'" aria-label="아래로">↓</button> <button type="button" class="btn sm danger" data-act="delorg" data-o="'+o.id+'">삭제</button></td></tr>';
+ });
+ h+='</tbody></table></div><div class="row" style="margin-top:12px"><label class="f">팀<input id="newTeam" placeholder="예) 안전시설팀"></label><label class="f" style="flex:1;min-width:200px">사업소<input id="newOrg" placeholder="새 사업소 이름"></label><button type="button" class="btn primary" data-act="addorg">+ 사업소 추가</button></div>'
+  +'<p style="font-size:12px;color:var(--sub);margin:8px 0 0">같은 팀 이름끼리 연간표에서 묶여 보여요. 팀 이름을 바꾸면 소속이 바뀝니다.</p></div>';
+ h+='<div class="card"><h3 style="margin:0 0 10px">점검 항목</h3><table class="list"><thead><tr><th>이름</th><th style="width:90px"></th></tr></thead><tbody>'
+  +S.checks.map(function(c){return '<tr><td><input data-check="'+c.id+'" value="'+esc(c.name)+'"></td><td><button type="button" class="btn sm danger" data-act="delcheck" data-c="'+c.id+'">삭제</button></td></tr>';}).join('')
+  +'</tbody></table><div class="row" style="margin-top:12px"><label class="f" style="flex:1;min-width:200px">새 점검 항목<input id="newCheck" placeholder="예) 수시 위험성평가 결과"></label><button type="button" class="btn primary" data-act="addcheck">+ 항목 추가</button></div></div>';
+ h+='<div class="card"><h3 style="margin:0 0 10px">표시 기호와 이름</h3><p style="font-size:13px;color:var(--sub);margin:0 0 10px">원본 문서의 x, §처럼 뜻을 정해 두고 싶은 기호는 여기서 이름을 바꾸세요. 미제출 목록에도 이 이름으로 나옵니다.</p><table class="list"><thead><tr><th style="width:90px">미리보기</th><th style="width:120px">칸에 보일 글자</th><th>이름</th></tr></thead><tbody>'
+  +ST.map(function(k){var l=lab(k);return '<tr><td>'+chip(k)+'</td><td><input data-lab="'+k+'" data-f="sym" value="'+esc(l.sym)+'" maxlength="4"></td><td><input data-lab="'+k+'" data-f="name" value="'+esc(l.name)+'"></td></tr>';}).join('')
+  +'</tbody></table><div style="margin-top:12px"><button type="button" class="btn danger" data-act="reseed">처음 상태(한글 문서 데이터)로 되돌리기</button></div></div>';
+ return h;
+}
+
+/* ---------- 화면 ---------- */
+function renderTabs(){
+ var mc=missingCount();
+ $('#tabs').innerHTML=S.checks.map(function(c){return '<button type="button" role="tab" data-act="tab" data-v="'+c.id+'" aria-selected="'+(view===c.id)+'">'+esc(c.name)+'</button>';}).join('')
+  +'<button type="button" role="tab" data-act="tab" data-v="report" aria-selected="'+(view==='report')+'">미제출 목록'+(mc?'<span class="cnt">'+mc+'</span>':'')+'</button>'
+  +'<button type="button" role="tab" data-act="tab" data-v="settings" aria-selected="'+(view==='settings')+'">사업소·설정</button>';
+}
+function render(){
+ closePicker();
+ $('#yearLabel').textContent=year+'년';
+ $('.yearnav').style.visibility=(view==='report'||view==='settings')?'hidden':'visible';
+ renderTabs();
+ var isCheck=S.checks.some(function(c){return c.id===view;});
+ $('#main').innerHTML=isCheck?renderCheck(view):(view==='report'?renderReport():renderSettings());
+ $('#owner').value=S.owner;
+ renderWarn();
+}
+
+/* ---------- 선택 상자 ---------- */
+function closePicker(){$('#pk').innerHTML='';pickCtx=null;}
+function openPicker(anchor,ctx){
+ pickCtx=ctx;
+ var h='<div class="picker" role="dialog" aria-label="상태 선택"><div class="ttl">'+esc(ctx.title)+'</div><div class="opts">';
+ ST.concat(['']).forEach(function(k){
+  var cur=ctx.cur===k&&!ctx.bulk;
+  h+='<button type="button" data-act="pick" data-v="'+k+'" class="'+(cur?'on':'')+'">'+chip(k)+(k?esc(lab(k).name):'비우기(미확인)')+'</button>';
+ });
+ h+='</div>';
+ if(ctx.bulk)h+='<div style="font-size:12px;color:var(--sub);margin-top:6px">고른 상태로 이 달의 <b>빈칸만</b> 채웁니다. 이미 표시된 칸은 그대로 둡니다.</div>';
+ h+='</div>';
+ $('#pk').innerHTML=h;
+ var p=$('.picker'),r=anchor.getBoundingClientRect();
+ var left=Math.min(window.scrollX+r.left,window.scrollX+document.documentElement.clientWidth-p.offsetWidth-8);
+ var top=window.scrollY+r.bottom+4;
+ if(r.bottom+p.offsetHeight+8>window.innerHeight&&r.top>p.offsetHeight+8)top=window.scrollY+r.top-p.offsetHeight-4;
+ p.style.left=Math.max(8,left)+'px';p.style.top=top+'px';
+ var first=p.querySelector('button.on')||p.querySelector('button');if(first)first.focus();
+}
+
+/* ---------- 내보내기 ---------- */
+function download(name,blob){var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href);},1500);}
+function aoaFor(cid){
+ var rows=[[year+'년 위험성평가 '+checkName(cid)+' 제출 현황'],[],['팀','사업소'].concat(MONTHS.map(function(m){return m+'월';})).concat(['미제출'])];
+ S.orgs.forEach(function(o){
+  var miss=0;
+  rows.push([o.team,o.name].concat(MONTHS.map(function(m){var k=get(year,cid,o.id,m);if(k==='miss')miss++;return k?lab(k).sym:'';})).concat([miss]));
+ });
+ rows.push([],['범례'].concat(ST.map(function(k){return lab(k).sym+' = '+lab(k).name;})).concat(['빈칸 = 미확인']));
+ return rows;
+}
+function exportXlsx(){
+ if(!window.XLSX){
+  alert('엑셀 라이브러리를 불러오지 못했습니다(인터넷 연결 필요). 대신 CSV로 내려받습니다.');
+  var csv=aoaFor(view==='report'||view==='settings'?S.checks[0].id:view).map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\r\n');
+  download('위험성평가_제출현황_'+year+'.csv',new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));return;
+ }
+ var wb=XLSX.utils.book_new();
+ S.checks.forEach(function(c){
+  var ws=XLSX.utils.aoa_to_sheet(aoaFor(c.id));ws['!cols']=[{wch:12},{wch:30}].concat(MONTHS.map(function(){return {wch:7};})).concat([{wch:8}]);
+  XLSX.utils.book_append_sheet(wb,ws,c.name.replace(/[\\\/?*\[\]:]/g,'').slice(0,31)||c.id);
+ });
+ var rep=[['연도','월','점검 항목','구분','팀','사업소']];
+ MONTHS.forEach(function(m){if(year===today.y&&m>today.m)return;reportFor(year,m).forEach(function(r){['miss','x','sec'].forEach(function(k){r.g[k].forEach(function(o){rep.push([year,m,r.c.name,lab(k).name,o.team,o.name]);});});});});
+ var ws2=XLSX.utils.aoa_to_sheet(rep);ws2['!cols']=[{wch:6},{wch:4},{wch:18},{wch:14},{wch:12},{wch:30}];
+ XLSX.utils.book_append_sheet(wb,ws2,'미제출 목록');
+ XLSX.writeFile(wb,'위험성평가_제출현황_'+year+'.xlsx');
+}
+function backup(){download('위험성평가_제출현황_백업_'+new Date().toISOString().slice(0,10)+'.json',new Blob([JSON.stringify({app:'risk-submit-status',v:1,data:S},null,1)],{type:'application/json'}));}
+function restore(file){
+ var fr=new FileReader();
+ fr.onload=function(){try{var j=JSON.parse(fr.result),d=j&&j.data?j.data:j;if(!valid(d))throw new Error('형식이 맞지 않습니다');
+  if(!confirm('현재 내용을 이 백업 파일의 내용으로 바꿉니다. 계속할까요?'))return;S=normalize(d);view=S.checks[0].id;save();render();}catch(e){alert('백업 파일을 읽지 못했습니다: '+e.message);}};
+ fr.readAsText(file);
+}
+function doPrint(){
+ var h='';
+ S.checks.forEach(function(c){
+  h+='<section class="psec"><h2>'+year+'년 위험성평가 '+esc(c.name)+' 제출 현황</h2><div class="pm"><span>'+ST.map(function(k){return esc(lab(k).sym)+' '+esc(lab(k).name);}).join(' · ')+' · 노란 칸 미제출</span><span>'+(S.owner?esc(S.owner)+' · ':'')+'출력일 '+new Date().toISOString().slice(0,10)+'</span></div><table><thead><tr><th>팀</th><th>사업소</th>'+MONTHS.map(function(m){return '<th>'+m+'</th>';}).join('')+'</tr></thead><tbody>';
+  var no=0;
+  teams().forEach(function(t){t.orgs.forEach(function(o,i){no++;
+   h+='<tr>'+(i===0?'<td rowspan="'+t.orgs.length+'">'+esc(t.team)+'</td>':'')+'<td class="l">'+no+'. '+esc(o.name)+'</td>'+MONTHS.map(function(m){var k=get(year,c.id,o.id,m);return '<td class="'+(k==='miss'?'miss':'')+'">'+(k&&k!=='miss'?esc(lab(k).sym):'')+'</td>';}).join('')+'</tr>';
+  });});
+  h+='</tbody></table></section>';
+ });
+ $('#printRoot').innerHTML=h;document.body.classList.add('printing');setTimeout(function(){window.print();},50);
+}
+window.addEventListener('afterprint',function(){document.body.classList.remove('printing');});
+function copyReport(){
+ var t=$('#copyText');
+ var done=function(){var b=document.querySelector('[data-act=copy]');if(b){b.textContent='복사했어요 ✓';setTimeout(function(){b.textContent='목록 복사 (메신저·공문용)';},1500);}};
+ try{navigator.clipboard.writeText(t.value).then(done,function(){t.select();document.execCommand('copy');done();});}
+ catch(e){t.select();try{document.execCommand('copy');done();}catch(e2){}}
+}
+
+/* ---------- 이벤트 ---------- */
+function moveOrg(id,dir){var i=S.orgs.findIndex(function(o){return o.id===id;}),j=i+dir;if(j<0||j>=S.orgs.length)return;var t=S.orgs[i];S.orgs[i]=S.orgs[j];S.orgs[j]=t;save();render();}
+document.addEventListener('click',function(e){
+ var b=e.target.closest('[data-act]');
+ if(!b){if(!e.target.closest('.picker'))closePicker();return;}
+ var a=b.dataset.act;
+ if(b.disabled)return;
+ if(b.tagName==='SELECT'||b.tagName==='INPUT')return;
+ if(a!=='pick'&&a!=='cell'&&a!=='mhead')closePicker();
+ if(a==='year'){year+=parseInt(b.dataset.v,10);render();}
+ else if(a==='tab'){view=b.dataset.v;render();}
+ else if(a==='cell'){
+  var o=S.orgs.filter(function(x){return x.id===b.dataset.o;})[0],m=+b.dataset.m;
+  openPicker(b,{cid:view,oid:o.id,m:m,cur:get(year,view,o.id,m),title:o.name+' · '+year+'년 '+m+'월'});
+ }
+ else if(a==='mhead'){var mm=+b.dataset.m;openPicker(b,{cid:view,m:mm,bulk:true,title:year+'년 '+mm+'월 빈칸 일괄 입력'});}
+ else if(a==='pick'&&pickCtx){
+  var v=b.dataset.v,c=pickCtx;
+  if(c.bulk){var n=0;S.orgs.forEach(function(o){if(!get(year,c.cid,o.id,c.m)&&v){set(year,c.cid,o.id,c.m,v);n++;}});}
+  else set(year,c.cid,c.oid,c.m,v);
+  save();render();
+ }
+ else if(a==='copy'){copyReport();}
+ else if(a==='addorg'){var nm=$('#newOrg').value.trim(),tm=$('#newTeam').value.trim();if(!nm){alert('사업소 이름을 적어 주세요.');return;}S.orgs.push({id:uid('o'),team:tm||nm,name:nm});save();render();}
+ else if(a==='delorg'){var oo=S.orgs.filter(function(x){return x.id===b.dataset.o;})[0];if(oo&&confirm('"'+oo.name+'" 사업소와 모든 연도의 표시 기록을 삭제할까요?')){S.orgs=S.orgs.filter(function(x){return x.id!==oo.id;});Object.keys(S.marks).forEach(function(y){Object.keys(S.marks[y]).forEach(function(c){delete S.marks[y][c][oo.id];});});save();render();}}
+ else if(a==='up'){moveOrg(b.dataset.o,-1);}
+ else if(a==='down'){moveOrg(b.dataset.o,1);}
+ else if(a==='addcheck'){var cn=$('#newCheck').value.trim();if(!cn){alert('점검 항목 이름을 적어 주세요.');return;}S.checks.push({id:uid('c'),name:cn});save();render();}
+ else if(a==='delcheck'){if(S.checks.length===1){alert('점검 항목이 하나뿐이라 삭제할 수 없습니다.');return;}var cc=b.dataset.c;if(confirm('"'+checkName(cc)+'" 항목과 그 기록을 모두 삭제할까요?')){S.checks=S.checks.filter(function(x){return x.id!==cc;});Object.keys(S.marks).forEach(function(y){delete S.marks[y][cc];});save();render();}}
+ else if(a==='reseed'){if(confirm('지금까지 입력한 내용을 모두 지우고 한글 문서에서 옮긴 처음 상태로 되돌릴까요?')){S=fresh();view='c1';save();render();}}
+ else if(a==='xlsx'){$('#dl').open=false;exportXlsx();}
+ else if(a==='print'){$('#dl').open=false;doPrint();}
+ else if(a==='backup'){$('#dl').open=false;backup();}
+ else if(a==='restore'){$('#dl').open=false;$('#file').click();}
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closePicker();});
+window.addEventListener('resize',closePicker);
+document.addEventListener('change',function(e){
+ var el=e.target,a=el.dataset&&el.dataset.act;
+ if(el.id==='file'){if(el.files&&el.files[0])restore(el.files[0]);el.value='';return;}
+ if(a==='repY'){repYear=+el.value;render();}
+ else if(a==='repM'){repMonth=+el.value;render();}
+ else if(el.dataset.org||el.dataset.check||el.dataset.lab){render();}
+});
+document.addEventListener('input',function(e){
+ var el=e.target;
+ if(el.id==='owner'){S.owner=el.value;save();}
+ else if(el.dataset.org){var o=S.orgs.filter(function(x){return x.id===el.dataset.org;})[0];if(o){o[el.dataset.f]=el.value;save();}}
+ else if(el.dataset.check){var c=S.checks.filter(function(x){return x.id===el.dataset.check;})[0];if(c){c.name=el.value;save();renderTabs();}}
+ else if(el.dataset.lab){S.labels[el.dataset.lab][el.dataset.f]=el.value;save();}
+});
+try{localStorage.setItem(KEY+'.t','1');localStorage.removeItem(KEY+'.t');}catch(e){storageOK=false;}
+render();
+})();
+</script>
+</body>
+</html>
